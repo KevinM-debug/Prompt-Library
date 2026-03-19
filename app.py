@@ -82,11 +82,12 @@ def initialize_database():
     if 'official_website' not in tool_cols:
         c.execute("ALTER TABLE tools ADD COLUMN official_website TEXT")
 
+
     c.execute("PRAGMA table_info(tags)")
     tag_cols = [row[1] for row in c.fetchall()]
     if 'category_suggestion' not in tag_cols:
         c.execute("ALTER TABLE tags ADD COLUMN category_suggestion TEXT")
-        
+
     conn.commit()
     conn.close()
 
@@ -207,6 +208,7 @@ if current_table == "📊 Analytics":
 # MODULE 1: PROMPTS MASTER TABLE
 # ==========================================
 elif current_table == "📝 Prompts":
+    # 🔥 ADDED TAB 5 FOR A/B TESTING 🔥
     tab1, tab2, tab3, tab4, tab5 = st.tabs(["🗂️ Prompts Grid", "➕ Log New Prompt", "🚀 Compile Variables", "⚙️ Manage & Edit", "⚖️ A/B Testing"])
 
     with tab1:
@@ -349,6 +351,7 @@ elif current_table == "📝 Prompts":
             compile_dict = dict(zip(compile_df['id'], compile_df['prompt_name']))
             selected_id = st.selectbox("Select Prompt to Compile", options=compile_dict.keys(), format_func=lambda x: compile_dict[x])
             
+            # Use the HTML cleaner so the API doesn't get confused by Quill formatting
             base_text = clean_html_for_copy(compile_df.loc[compile_df['id'] == selected_id, 'full_prompt_text'].values[0])
             
             with st.expander("View Base Template"): 
@@ -464,6 +467,9 @@ elif current_table == "📝 Prompts":
         else:
             st.info("No prompts to manage. Log a new prompt first!")
 
+    # ==========================================
+    # 🔥 MODULE 1 / TAB 5: A/B TESTING 🔥
+    # ==========================================
     with tab5:
         st.markdown("### ⚖️ A/B Test Your Prompts")
         st.markdown("Compare how two different AI models respond to the exact same prompt.")
@@ -476,6 +482,7 @@ elif current_table == "📝 Prompts":
             ab_dict = dict(zip(ab_df['id'], ab_df['prompt_name']))
             ab_selected_id = st.selectbox("Select Prompt to Test", options=ab_dict.keys(), format_func=lambda x: ab_dict[x])
             
+            # Clean HTML out of the text before parsing variables or sending to AI
             ab_base_text = clean_html_for_copy(ab_df.loc[ab_df['id'] == ab_selected_id, 'full_prompt_text'].values[0])
             
             ab_variables = list(set(re.findall(r'\[(.*?)\]', ab_base_text)))
@@ -483,7 +490,7 @@ elif current_table == "📝 Prompts":
             
             if ab_variables:
                 st.markdown("**Fill in your variables for the test:**")
-                ab_cols = st.columns(3) 
+                ab_cols = st.columns(3) # Create up to 3 columns for variables
                 ab_inputs = {}
                 for i, var in enumerate(ab_variables):
                     with ab_cols[i % 3]:
@@ -497,12 +504,13 @@ elif current_table == "📝 Prompts":
                 
             st.divider()
             
+            # --- MODEL SELECTION & EXECUTION ---
             st.markdown("### 🤖 Select Models to Compare")
             api_models = ["gpt-4o", "gpt-4-turbo", "gpt-3.5-turbo"]
             col_mod1, col_mod2 = st.columns(2)
             
             ab_model_A = col_mod1.selectbox("Model A:", api_models, index=0)
-            ab_model_B = col_mod2.selectbox("Model B:", api_models, index=2) 
+            ab_model_B = col_mod2.selectbox("Model B:", api_models, index=2) # Defaults to gpt-3.5
             
             if st.button("🚀 Run A/B Test", type="primary"):
                 if not api_key:
@@ -515,6 +523,7 @@ elif current_table == "📝 Prompts":
                         st.markdown("---")
                         res_col1, res_col2 = st.columns(2)
                         
+                        # --- RUN MODEL A ---
                         with res_col1:
                             st.markdown(f"**🟢 {ab_model_A} Response:**")
                             with st.spinner("Thinking..."):
@@ -527,6 +536,7 @@ elif current_table == "📝 Prompts":
                                 )
                                 st.info(response_A.choices[0].message.content)
                                 
+                        # --- RUN MODEL B ---
                         with res_col2:
                             st.markdown(f"**🔵 {ab_model_B} Response:**")
                             with st.spinner("Thinking..."):
