@@ -1,0 +1,4 @@
+pandas
+streamlit-quill
+st-copy-to-clipboard
+openai
