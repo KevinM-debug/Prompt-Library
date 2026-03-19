@@ -82,7 +82,7 @@ def initialize_database():
     if 'official_website' not in tool_cols:
         c.execute("ALTER TABLE tools ADD COLUMN official_website TEXT")
 
-   c.execute("PRAGMA table_info(tags)")
+    c.execute("PRAGMA table_info(tags)")
     tag_cols = [row[1] for row in c.fetchall()]
     if 'category_suggestion' not in tag_cols:
         c.execute("ALTER TABLE tags ADD COLUMN category_suggestion TEXT")
