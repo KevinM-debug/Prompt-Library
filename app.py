@@ -83,7 +83,7 @@ def initialize_database():
         c.execute("ALTER TABLE tools ADD COLUMN official_website TEXT")
 
 
-        c.execute("PRAGMA table_info(tags)")
+    c.execute("PRAGMA table_info(tags)")
     tag_cols = [row[1] for row in c.fetchall()]
     if 'category_suggestion' not in tag_cols:
         c.execute("ALTER TABLE tags ADD COLUMN category_suggestion TEXT")
@@ -582,7 +582,7 @@ elif current_table == "⚙️ Tools":
             st.info("No tools logged yet.")
 
     with t2:
-        with st.form("tool_form", clear_on_submit=True):
+      with st.form("tool_form"):
             new_tool = st.text_input("Tool Name*")
             tool_type = st.text_input("Tool Type (e.g., Productivity, AI)")
             website = st.text_input("Official Website")
@@ -633,7 +633,7 @@ elif current_table == "🗂️ Projects":
             st.info("No projects logged yet.")
 
     with p2:
-        with st.form("proj_form", clear_on_submit=True):
+        with st.form("proj_form"):
             new_proj = st.text_input("Project Name*")
             status = st.selectbox("Status", ["Planning", "In Progress", "Completed"])
             
@@ -683,7 +683,7 @@ elif current_table == "🏷️ Tags":
             st.info("No tags logged yet.")
 
     with tg2:
-        with st.form("tag_form", clear_on_submit=True):
+        with st.form("tag_form"):
             new_tag = st.text_input("Tag Name*")
             category = st.text_input("Category Suggestion")
             
