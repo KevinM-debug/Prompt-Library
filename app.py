@@ -556,7 +556,30 @@ elif current_table == "⚙️ Tools":
         conn = get_connection()
         df_tools = pd.read_sql_query("SELECT * FROM tools ORDER BY id DESC", conn)
         conn.close()
-        st.dataframe(df_tools, use_container_width=True, hide_index=True, column_config={"id": None})
+        
+        if not df_tools.empty:
+            st.markdown("💡 *Select a row in the grid below to delete it.*")
+            selection_tools = st.dataframe(
+                df_tools, use_container_width=True, hide_index=True, 
+                on_select="rerun", selection_mode="single-row", key="tools_grid",
+                column_config={"id": None}
+            )
+            
+            selected_tools_rows = selection_tools.selection.rows
+            if len(selected_tools_rows) > 0:
+                selected_tool_id = int(df_tools.iloc[selected_tools_rows[0]]['id'])
+                tool_name = df_tools.iloc[selected_tools_rows[0]]['tool_name']
+                
+                if st.button(f"🗑️ Delete '{tool_name}'", type="primary"):
+                    conn = get_connection()
+                    conn.execute("DELETE FROM tools WHERE id=?", (selected_tool_id,))
+                    conn.commit()
+                    conn.close()
+                    st.success("Tool deleted!")
+                    st.rerun()
+        else:
+            st.info("No tools logged yet.")
+
     with t2:
         with st.form("tool_form"):
             new_tool = st.text_input("Tool Name*")
@@ -584,7 +607,30 @@ elif current_table == "🗂️ Projects":
         conn = get_connection()
         df_proj = pd.read_sql_query("SELECT * FROM projects ORDER BY id DESC", conn)
         conn.close()
-        st.dataframe(df_proj, use_container_width=True, hide_index=True, column_config={"id": None})
+        
+        if not df_proj.empty:
+            st.markdown("💡 *Select a row in the grid below to delete it.*")
+            selection_proj = st.dataframe(
+                df_proj, use_container_width=True, hide_index=True, 
+                on_select="rerun", selection_mode="single-row", key="proj_grid",
+                column_config={"id": None}
+            )
+            
+            selected_proj_rows = selection_proj.selection.rows
+            if len(selected_proj_rows) > 0:
+                selected_proj_id = int(df_proj.iloc[selected_proj_rows[0]]['id'])
+                proj_name = df_proj.iloc[selected_proj_rows[0]]['project_name']
+                
+                if st.button(f"🗑️ Delete '{proj_name}'", type="primary"):
+                    conn = get_connection()
+                    conn.execute("DELETE FROM projects WHERE id=?", (selected_proj_id,))
+                    conn.commit()
+                    conn.close()
+                    st.success("Project deleted!")
+                    st.rerun()
+        else:
+            st.info("No projects logged yet.")
+
     with p2:
         with st.form("proj_form"):
             new_proj = st.text_input("Project Name*")
@@ -611,7 +657,30 @@ elif current_table == "🏷️ Tags":
         conn = get_connection()
         df_tags = pd.read_sql_query("SELECT * FROM tags ORDER BY id DESC", conn)
         conn.close()
-        st.dataframe(df_tags, use_container_width=True, hide_index=True, column_config={"id": None})
+        
+        if not df_tags.empty:
+            st.markdown("💡 *Select a row in the grid below to delete it.*")
+            selection_tags = st.dataframe(
+                df_tags, use_container_width=True, hide_index=True, 
+                on_select="rerun", selection_mode="single-row", key="tags_grid",
+                column_config={"id": None}
+            )
+            
+            selected_tags_rows = selection_tags.selection.rows
+            if len(selected_tags_rows) > 0:
+                selected_tag_id = int(df_tags.iloc[selected_tags_rows[0]]['id'])
+                tag_name = df_tags.iloc[selected_tags_rows[0]]['tag_name']
+                
+                if st.button(f"🗑️ Delete '{tag_name}'", type="primary"):
+                    conn = get_connection()
+                    conn.execute("DELETE FROM tags WHERE id=?", (selected_tag_id,))
+                    conn.commit()
+                    conn.close()
+                    st.success("Tag deleted!")
+                    st.rerun()
+        else:
+            st.info("No tags logged yet.")
+
     with tg2:
         with st.form("tag_form"):
             new_tag = st.text_input("Tag Name*")
